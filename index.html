@@ -1,0 +1,109 @@
+<html>
+	<head>
+	<script>
+		class Obj {
+			constructor(pos, vel = {x: 0, y: 0}, radius = 5) {
+				this.pos = pos
+				this.vel = vel
+				this.radius = radius
+			}
+		}
+
+		let screen = {x: 0, y: 0, width: 0, height: 0}
+		let canvas, ctx
+
+		let interval = 10
+
+		function updateResize() {
+			screen.height = window.innerHeight
+			screen.width = window.innerWidth
+			canvas.width = screen.width
+			canvas.height = screen.height
+		}
+
+		function onUpdate() {
+			screen.x = window.screenX
+			screen.y = window.screenY
+
+			document.body.style.backgroundPosition = `-${screen.x}px -${screen.y}px`
+
+			let gravity = 0.5
+			let bounceFactor = 2.0
+
+			ball.vel.y += gravity
+
+			ball.pos.x += ball.vel.x
+			ball.pos.y += ball.vel.y
+
+			if (ball.pos.y > screen.y + screen.height - ball.radius) {
+				let diff = ball.pos.y - (screen.y + screen.height - ball.radius)
+				ball.pos.y -= diff
+				ball.vel.y = -Math.abs(ball.vel.y) / bounceFactor
+				ball.vel.y -= diff / bounceFactor
+			}
+			if (ball.pos.x > screen.x + screen.width - ball.radius) {
+				let diff = ball.pos.x - (screen.x + screen.width - ball.radius)
+				ball.pos.x -= diff
+				ball.vel.x = -Math.abs(ball.vel.x) / bounceFactor
+				ball.vel.x -= diff / bounceFactor
+			}
+			if (ball.pos.y < screen.y + ball.radius) {
+				let diff = ball.pos.y - (screen.y + ball.radius)
+				ball.pos.y -= diff
+				ball.vel.y = Math.abs(ball.vel.y) / bounceFactor
+				ball.vel.y -= diff / bounceFactor
+			}
+			if (ball.pos.x < screen.x + ball.radius) {
+				let diff = ball.pos.x - (screen.x + ball.radius)
+				ball.pos.x -= diff
+				ball.vel.x = Math.abs(ball.vel.x) / bounceFactor
+				ball.vel.x -= diff / bounceFactor
+			}
+
+			ball.vel.x *= 0.99
+			ball.vel.y *= 0.99
+		}
+
+		function start() {
+			let d = setInterval(onUpdate, interval)
+
+			canvas = document.querySelector("#mover")
+			ctx = canvas.getContext("2d")
+
+			requestAnimationFrame(draw)
+
+			window.addEventListener("resize", updateResize)
+			updateResize() // To initiate sizing
+		}
+
+		let ball = new Obj({
+			x: 150,
+			y: 100,
+		}, {x: 0, y: 0}, 50)
+
+		function draw() {
+			ctx.clearRect(0, 0, screen.width, screen.height)
+
+			ctx.fillStyle = "#cccccc"
+			ctx.beginPath()
+			ctx.arc(ball.pos.x - screen.x, ball.pos.y - screen.y, ball.radius, 0, 2 * Math.PI)
+			ctx.fill()
+			requestAnimationFrame(draw)
+		}
+
+		window.onload = start
+	</script>
+	<style>
+	body {
+		margin: 0;
+		background: url("http://www.talencia.cat/mypics/max/1/19229_space-game-background.jpg");
+	}
+	html {
+		overflow: hidden;
+	}
+	</style>
+	</head>
+	<body>
+		<canvas id="mover" />
+	</body>
+</html>
